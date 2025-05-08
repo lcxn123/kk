@@ -1,6 +1,8 @@
 package ngrams;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -29,8 +31,22 @@ public class TimeSeries extends TreeMap<Integer, Double> {
      * inclusive of both end points.
      */
     public TimeSeries(TimeSeries ts, int startYear, int endYear) {
+        // 显式调用父类构造函数，确保父类初始化为 TreeMap
         super();
-        // TODO: Fill in this constructor.
+
+        // 检查输入参数的有效性
+        if (ts == null) {
+            throw new IllegalArgumentException("The input TimeSeries cannot be null.");
+        }
+        if (startYear > endYear) {
+            throw new IllegalArgumentException("Start year must be less than or equal to end year.");
+        }
+
+        // 获取指定范围内的子映射
+        Map<Integer, Double> subMap = ts.subMap(startYear, true, endYear, true);
+
+        // 将子映射的内容复制到当前对象
+        this.putAll(subMap);
     }
 
     /**
@@ -38,7 +54,11 @@ public class TimeSeries extends TreeMap<Integer, Double> {
      */
     public List<Integer> years() {
         // TODO: Fill in this method.
-        return null;
+        List<Integer> yearList = new ArrayList<>();
+        for (Integer key : this.keySet()){
+            yearList.add(key);
+        }
+        return yearList;
     }
 
     /**
@@ -47,7 +67,11 @@ public class TimeSeries extends TreeMap<Integer, Double> {
      */
     public List<Double> data() {
         // TODO: Fill in this method.
-        return null;
+        List<Double> dataList = new ArrayList<>();
+        for (Double value : this.values()){
+            dataList.add(value);
+        }
+        return dataList;
     }
 
     /**
@@ -61,7 +85,27 @@ public class TimeSeries extends TreeMap<Integer, Double> {
      */
     public TimeSeries plus(TimeSeries ts) {
         // TODO: Fill in this method.
-        return null;
+        TimeSeries PlusTs = new TimeSeries();
+        for (Map.Entry<Integer,Double> entry : ts.entrySet()){
+            int key = entry.getKey();
+            double value = entry.getValue();
+            PlusTs.put(key,value);
+        }
+
+        for (Map.Entry<Integer,Double> entry : this.entrySet()){
+            int key = entry.getKey();
+            double value = entry.getValue();
+
+            // 检测是否含有相同key
+            if (PlusTs.containsKey(key)){
+                value += PlusTs.get(key);
+            }
+            PlusTs.put(key,value);
+
+        }
+
+        return PlusTs;
+
     }
 
     /**
@@ -75,9 +119,31 @@ public class TimeSeries extends TreeMap<Integer, Double> {
      */
     public TimeSeries dividedBy(TimeSeries ts) {
         // TODO: Fill in this method.
-        return null;
+        TimeSeries result = new TimeSeries();
+
+        for (Map.Entry<Integer, Double> entry : this.entrySet()) {
+            int year = entry.getKey();
+            Double value = entry.getValue();
+
+            // 检查 ts 是否包含当前年份
+            if (!ts.containsKey(year)) {
+                throw new IllegalArgumentException("TS is missing a year that exists in this TimeSeries: " + year);
+            }
+
+            // 获取 ts 中对应年份的值
+            Double tsValue = ts.get(year);
+
+            // 防止除以零
+            if (tsValue == null || tsValue == 0) {
+                throw new IllegalArgumentException("Value for year " + year + " in TS is zero or null.");
+            }
+
+            // 计算商并存入结果
+            result.put(year, value / tsValue);
+        }
+
+        return result;
     }
 
-    // TODO: Add any private helper methods.
-    // TODO: Remove all TODO comments before submitting.
 }
+

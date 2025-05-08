@@ -4,15 +4,13 @@ public class RedBlackTree<T extends Comparable<T>> {
     RBTreeNode<T> root;
 
     static class RBTreeNode<T> {
-
-        final T item;
+        T item;
         boolean isBlack;
         RBTreeNode<T> left;
         RBTreeNode<T> right;
 
         /**
-         * Creates a RBTreeNode with item ITEM and color depending on ISBLACK
-         * value.
+         * Creates a RBTreeNode with item ITEM and color depending on ISBLACK value.
          * @param isBlack
          * @param item
          */
@@ -21,15 +19,13 @@ public class RedBlackTree<T extends Comparable<T>> {
         }
 
         /**
-         * Creates a RBTreeNode with item ITEM, color depending on ISBLACK
-         * value, left child LEFT, and right child RIGHT.
+         * Creates a RBTreeNode with item ITEM, color depending on ISBLACK value, left child LEFT, and right child RIGHT.
          * @param isBlack
          * @param item
          * @param left
          * @param right
          */
-        RBTreeNode(boolean isBlack, T item, RBTreeNode<T> left,
-                   RBTreeNode<T> right) {
+        RBTreeNode(boolean isBlack, T item, RBTreeNode<T> left, RBTreeNode<T> right) {
             this.isBlack = isBlack;
             this.item = item;
             this.left = left;
@@ -45,41 +41,60 @@ public class RedBlackTree<T extends Comparable<T>> {
     }
 
     /**
-     * Flips the color of node and its children. Assume that NODE has both left
-     * and right children
+     * Flips the color of node and its children. Assume that NODE has both left and right children.
      * @param node
      */
     void flipColors(RBTreeNode<T> node) {
-        // TODO: YOUR CODE HERE
+        // 交换节点及其子节点的颜色
+        node.isBlack = !node.isBlack;
+        if (node.left != null) {
+            node.left.isBlack = !node.left.isBlack;
+        }
+        if (node.right != null) {
+            node.right.isBlack = !node.right.isBlack;
+        }
     }
 
     /**
-     * Rotates the given node to the right. Returns the new root node of
-     * this subtree. For this implementation, make sure to swap the colors
-     * of the new root and the old root!
+     * Rotates the given node to the right. Returns the new root node of this subtree.
+     * For this implementation, make sure to swap the colors of the new root and the old root!
      * @param node
      * @return
      */
     RBTreeNode<T> rotateRight(RBTreeNode<T> node) {
-        // TODO: YOUR CODE HERE
-        return null;
+        RBTreeNode<T> rotateNode = node.left;
+        node.left = rotateNode.right;
+        rotateNode.right = node;
+
+        // Swap colors
+        boolean tempColor = node.isBlack;
+        node.isBlack = rotateNode.isBlack;
+        rotateNode.isBlack = tempColor;
+
+        return rotateNode;
     }
 
     /**
-     * Rotates the given node to the left. Returns the new root node of
-     * this subtree. For this implementation, make sure to swap the colors
-     * of the new root and the old root!
+     * Rotates the given node to the left. Returns the new root node of this subtree.
+     * For this implementation, make sure to swap the colors of the new root and the old root!
      * @param node
      * @return
      */
     RBTreeNode<T> rotateLeft(RBTreeNode<T> node) {
-        // TODO: YOUR CODE HERE
-        return null;
+        RBTreeNode<T> rotateNode = node.right;
+        node.right = rotateNode.left;
+        rotateNode.left = node;
+
+        // Swap colors
+        boolean tempColor = node.isBlack;
+        node.isBlack = rotateNode.isBlack;
+        rotateNode.isBlack = tempColor;
+
+        return rotateNode;
     }
 
     /**
-     * Helper method that returns whether the given node is red. Null nodes (children or leaf
-     * nodes) are automatically considered black.
+     * Helper method that returns whether the given node is red. Null nodes (children or leaf nodes) are automatically considered black.
      * @param node
      * @return
      */
@@ -97,25 +112,38 @@ public class RedBlackTree<T extends Comparable<T>> {
     }
 
     /**
-     * Inserts the given node into this Red Black Tree. Comments have been provided to help break
-     * down the problem. For each case, consider the scenario needed to perform those operations.
+     * Inserts the given node into this Red Black Tree. Comments have been provided to help break down the problem.
+     * For each case, consider the scenario needed to perform those operations.
      * Make sure to also review the other methods in this class!
      * @param node
      * @param item
      * @return
      */
     private RBTreeNode<T> insert(RBTreeNode<T> node, T item) {
-        // TODO: Insert (return) new red leaf node.
+        if (node == null) {
+            return new RBTreeNode<>(false, item); // 新插入的节点为红色
+        }
 
-        // TODO: Handle normal binary search tree insertion.
+        int cmp = item.compareTo(node.item);
+        if (cmp < 0) {
+            node.left = insert(node.left, item);
+        } else if (cmp > 0) {
+            node.right = insert(node.right, item);
+        } else {
+            node.item = item; // 替换相同值的节点
+        }
 
-        // TODO: Rotate left operation
+        // 修复红黑树的性质
+        if (isRed(node.right) && !isRed(node.left)) {
+            node = rotateLeft(node); // 右子节点为红色，左子节点为黑色，进行左旋
+        }
+        if (isRed(node.left) && isRed(node.left.left)) {
+            node = rotateRight(node); // 左子节点和左子节点的左子节点均为红色，进行右旋
+        }
+        if (isRed(node.left) && isRed(node.right)) {
+            flipColors(node); // 左右子节点均为红色，进行颜色翻转
+        }
 
-        // TODO: Rotate right operation
-
-        // TODO: Color flip
-
-        return null; //fix this return statement
+        return node;
     }
-
 }
