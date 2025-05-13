@@ -9,21 +9,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class HyponymsHandler extends NgordnetQueryHandler {
+public class HyponymsHandlerForAuto extends NgordnetQueryHandler {
 
     private final WordNet wordNet;
 
-    public HyponymsHandler() {
+
+    public HyponymsHandlerForAuto() {
         super();
         wordNet = new WordNet("data/wordnet/synsets.txt", "data/wordnet/hyponyms.txt");
     }
 
-    public HyponymsHandler(String WordFilename, String filename) {
-        super();
-        wordNet = new WordNet(WordFilename, filename);
-    }
 
-    public HyponymsHandler(String wordFile, String countFile, String synsetFile, String hyponymFile) {
+    public HyponymsHandlerForAuto(String wordFile, String countFile, String synsetFile, String hyponymFile) {
         super();
         wordNet = new WordNet(synsetFile, hyponymFile);
     }
@@ -40,9 +37,6 @@ public class HyponymsHandler extends NgordnetQueryHandler {
 
         for (String word : words) {
             int id = wordNet.getId(word);
-            if (id == -1) {
-                continue;
-            }
             List<WordNode> wordList = wordNet.getHyponyms(id);
 
             if (wordList == null) {
@@ -50,19 +44,11 @@ public class HyponymsHandler extends NgordnetQueryHandler {
             }
             for (WordNode node : wordList) {
                 String[] sameword = wordNet.getSameWord(word);
-                result.append(Arrays.toString(sameword))
-                        .append(" ");
-                result.append(node.toString())
-                        .append("\n");
-
-
+                result.append(Arrays.toString(sameword));
             }
-            result.append("\n\n");
+
         }
 
-        if (result.isEmpty()) {
-            result.append("No this word");
-        }
 
         return result.toString();
     }
