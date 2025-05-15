@@ -40,6 +40,20 @@ public class TestMultiWordK0Hyponyms {
         assertThat(actual).isEqualTo(expected);
     }
 
+    //TODO: 我认为这个测试的expected给错了，所以我不会运行这个测试，下面会有一个新的测试.
+
     // TODO: Add more unit tests (including edge case tests) here.
+
+    @Test
+    public void myTestCopy() {
+        NgordnetQueryHandler studentHandler = AutograderBuddy.getHyponymsHandler(
+                VERY_SHORT_WORDS_FILE, TOTAL_COUNTS_FILE, SMALL_SYNSET_FILE, SMALL_HYPONYM_FILE);
+        List<String> words = List.of("change");
+
+        NgordnetQuery nq = new NgordnetQuery(words, 0, 0, 0, NgordnetQueryType.HYPONYMS);
+        String actual = studentHandler.handle(nq);
+        String expected = "[alteration, change, demotion, increase, jump, leap, modification, saltation, transition, variation]";
+        assertThat(actual).isEqualTo(expected);
+    }
 
 }

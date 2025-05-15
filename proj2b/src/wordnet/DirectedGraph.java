@@ -7,11 +7,15 @@ public class DirectedGraph {
     private Map<Integer, WordNode> nodes;
 
     public DirectedGraph() {
-        nodes = new HashMap<>();
+        nodes = new TreeMap<>();
     }
 
-    public void addNode(int id, String define) {
-        nodes.putIfAbsent(id, new WordNode(id, define));
+    public void addNode(int id, String define,List<String> synonymList) {
+        List<String> synonm = new ArrayList<>();
+        synonm.addAll(synonymList);
+        WordNode newnode = new WordNode(id, define,synonm);
+
+        nodes.putIfAbsent(id, newnode);
     }
 
     public Boolean addEdge(int sourceId, int destId) {
@@ -45,15 +49,17 @@ public class DirectedGraph {
 
         while (!queue.isEmpty()) {
             WordNode current = queue.poll();
-
-            visitOrder.add(current.getID()); // 记录顺序}
-
+            if (!current.equals(start)) {
+                visitOrder.add(current.getID());
+            }
             for (WordNode neighbor : current.getNeighbors()) {
                 if (visited.add(neighbor)) {
                     queue.add(neighbor);
                 }
+
             }
         }
+
         return visitOrder;
     }
 }

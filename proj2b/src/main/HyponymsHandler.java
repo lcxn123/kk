@@ -5,9 +5,7 @@ import browser.NgordnetQueryHandler;
 import wordnet.WordNet;
 import wordnet.WordNode;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class HyponymsHandler extends NgordnetQueryHandler {
 
@@ -27,7 +25,6 @@ public class HyponymsHandler extends NgordnetQueryHandler {
         super();
         wordNet = new WordNet(synsetFile, hyponymFile);
     }
-
     @Override
     public String handle(NgordnetQuery q) {
         List<String> words = q.words();
@@ -35,35 +32,59 @@ public class HyponymsHandler extends NgordnetQueryHandler {
             return "No words provided.";
         }
 
-        StringBuilder result = new StringBuilder();
-
+        // 用于存储所有下位词的集合（自动去重）
+        Set<String> allHyponymWords = new HashSet<>();
 
         for (String word : words) {
-            int id = wordNet.getId(word);
-            if (id == -1) {
-                continue;
+            Integer[] ids = wordNet.getId(word);
+            if (ids == null) {
+                continue; // 跳过不存在的单词
             }
-            List<WordNode> wordList = wordNet.getHyponyms(id);
 
-            if (wordList == null) {
-                continue;
+            List<WordNode> allHyponymNodes = new ArrayList<>();
+
+            for (int id : ids) {
+                Set<WordNode> wordList = wordNet.getHyponyms(id);
+                if (wordList != null) {
+                    allHyponymNodes.addAll(wordList);
+                }
+                allHyponymNodes.add(wordNet.getWordNode(id));
             }
-            for (WordNode node : wordList) {
-                String[] sameword = wordNet.getSameWord(word);
-                result.append(Arrays.toString(sameword))
-                        .append(" ");
-                result.append(node.toString())
-                        .append("\n");
 
 
+            allHyponymWords.add(word);
+            for (WordNode node : allHyponymNodes) {
+                allHyponymWords.add(node.toString());
             }
-            result.append("\n\n");
         }
 
-        if (result.isEmpty()) {
-            result.append("No this word");
+        // 如果没有找到任何下位词
+        if (allHyponymWords.isEmpty()) {
+            return "No hyponyms found.";
         }
 
-        return result.toString();
+
+
+        List<String> flatList = new ArrayList<>();
+        for (String item : allHyponymWords) {
+            // 处理子列表形式的元素
+            if (item.startsWith("[") && item.endsWith("]")) {
+                String[] wordss = item.substring(1, item.length() - 1).split(", ");
+                flatList.addAll(Arrays.asList(wordss));
+            }
+            // 处理单独的单词
+            else {
+                flatList.add(item);
+            }
+        }
+
+        Set<String> newset = new HashSet<>(flatList);
+
+        // 转换为列表并排序
+        List<String> sortedWords = new ArrayList<>(newset);
+        Collections.sort(sortedWords);
+
+        // 格式化为 [word1, word2, ...]
+        return "[" + String.join(", ", sortedWords) + "]";
+        }
     }
-}

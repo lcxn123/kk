@@ -9,6 +9,6 @@ public class AutograderBuddy {
             String wordFile, String countFile,
             String synsetFile, String hyponymFile) {
 
-        return new HyponymsHandlerForAuto(wordFile, countFile, synsetFile, hyponymFile);
+        return new HyponymsHandler(wordFile, countFile, synsetFile, hyponymFile);
     }
 }

@@ -1,18 +1,22 @@
 package wordnet;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class WordNode {
     // 创建基础节点
     private final int ID;
     private final String define;
+
+    private Collection<String> synonymList;
     private List<WordNode> neighbors;
 
 
-    public WordNode(int id, String define) {
+    public WordNode(int id, String define, Collection<String> synonymList) {
         this.ID = id;
         this.define = define;
+        this.synonymList = synonymList;
         this.neighbors = new ArrayList<>();
     }
 
@@ -35,6 +39,8 @@ public class WordNode {
 
     @Override
     public String toString() {
-        return define;
+
+        return this.synonymList.toString();
     }
+
 }
